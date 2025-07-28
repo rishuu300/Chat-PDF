@@ -38,3 +38,7 @@ datasets
 tiktoken
 PyPDF2
 gradio
+pinecone
+pinecone-text
+pinecone-notebooks
+langchain_nvidia_ai_endpoints
