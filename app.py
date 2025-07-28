@@ -12,7 +12,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings, ChatNVIDIA
-from langchain_chroma import Chroma
+from langchain.vectorstores import FAISS
 
 # Streamlit UI
 st.set_page_config(page_title="RAG PDF Chat", layout="wide")
@@ -54,7 +54,7 @@ if api_key:
                 splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
                 chunks = splitter.split_documents(all_docs)
 
-                vectorstore = Chroma.from_documents(chunks, embeddings)
+                vectorstore = FAISS.from_documents(chunks, embeddings)
                 retriever = vectorstore.as_retriever()
                 st.session_state.retriever = retriever
                 st.session_state.vector_ready = True
