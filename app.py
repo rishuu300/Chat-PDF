@@ -11,16 +11,8 @@ from langchain_core.runnables import RunnableWithMessageHistory
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings, ChatNVIDIA
 from langchain_chroma import Chroma
-from langchain_groq import ChatGroq
-
-# Load env variables
-load_dotenv()
-os.environ['HF_TOKEN'] = os.getenv('HF_TOKEN')
-
-# Embedding model
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 # Streamlit UI
 st.set_page_config(page_title="RAG PDF Chat", layout="wide")
@@ -28,7 +20,7 @@ st.title("📄 Conversational RAG with PDF + Chat History")
 st.markdown("Upload PDFs, embed them, and chat with context-rich answers.")
 
 # Input Groq API key
-api_key = st.text_input("🔑 Enter your Groq API Key", type="password")
+api_key = st.text_input("🔑 Enter your NVIDIA API Key", type="password")
 
 # Session & Chat setup
 session_id = st.text_input("🧠 Session ID", value="default_session")
@@ -44,7 +36,8 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
 uploaded_files = st.file_uploader("📤 Upload PDF files", type="pdf", accept_multiple_files=True)
 
 if api_key:
-    llm = ChatGroq(api_key=api_key, model="gemma2-9b-it")
+    llm = ChatNVIDIA(api_key = api_key, model="nvidia/llama-3.3-nemotron-super-49b-v1")
+    embeddings = NVIDIAEmbeddings(api_key = api_key, model="nvidia/llama-3.2-nemoretriever-300m-embed-v1")
 
     if uploaded_files and "vector_ready" not in st.session_state:
         with st.spinner("⚙️ Processing PDFs and creating embeddings..."):
@@ -117,5 +110,4 @@ if api_key:
             except Exception as e:
                 st.error(f"❌ Failed to get response: {e}")
 else:
-    st.warning("Please enter a valid Groq API key to begin.")
-
+    st.warning("Please enter a valid NVIDIA API key to begin.")
